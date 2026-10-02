@@ -1,0 +1,6 @@
+const express=require("express");const helmet=require("helmet");const cors=require("cors");const rateLimit=require("express-rate-limit");
+const authRoutes=require("./routes/authRoutes");const clienteRoutes=require("./routes/clienteRoutes");const usuarioRoutes=require("./routes/usuarioRoutes");const auditoriaRoutes=require("./routes/auditoriaRoutes");const healthRoutes=require("./routes/healthRoutes");
+const app=express();app.set("trust proxy",1);app.use(helmet());app.use(cors({origin:process.env.CORS_ORIGIN?process.env.CORS_ORIGIN.split(",").map(v=>v.trim()):true}));app.use(express.json({limit:"100kb"}));
+app.use("/api/auth/login",rateLimit({windowMs:15*60*1000,limit:10,standardHeaders:"draft-8",legacyHeaders:false,message:{erro:"Muitas tentativas. Tente novamente mais tarde."}}));
+app.get("/",(req,res)=>res.json({sistema:"Sistema Seguro",status:"online"}));app.use("/api/health",healthRoutes);app.use("/api/auth",authRoutes);app.use("/api/clientes",clienteRoutes);app.use("/api/usuarios",usuarioRoutes);app.use("/api/auditoria",auditoriaRoutes);
+app.use((req,res)=>res.status(404).json({erro:"Rota não encontrada"}));app.use((err,req,res,next)=>{console.error(err);res.status(err.status||500).json({erro:err.publicMessage||"Erro interno do servidor"});});module.exports=app;

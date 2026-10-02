@@ -1,0 +1,3 @@
+require("dotenv").config();const bcrypt=require("bcrypt");const {query,pool}=require("../src/db/pool");
+async function main(){const nome=process.env.ADMIN_NAME||"Administrador";const email=process.env.ADMIN_EMAIL||"admin@exemplo.com";const senha=process.env.ADMIN_PASSWORD;if(!senha)throw new Error("Defina ADMIN_PASSWORD temporariamente no ambiente antes de executar este script.");const hash=await bcrypt.hash(senha,12);const r=await query(`INSERT INTO usuarios (nome,email,senha_hash,perfil) VALUES ($1,$2,$3,'admin') RETURNING id,nome,email,perfil`,[nome,email,hash]);console.log("Administrador criado:",r.rows[0]);}
+main().catch(e=>{console.error("Erro ao criar administrador:",e.message);process.exitCode=1;}).finally(async()=>{await pool.end();});

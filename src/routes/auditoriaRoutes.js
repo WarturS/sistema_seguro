@@ -1,0 +1,1 @@
+const express=require("express");const auth=require("../middlewares/authMiddleware");const admin=require("../middlewares/requireAdmin");const c=require("../controllers/auditoriaController");const r=express.Router();r.use(auth,admin);r.get("/",c.listar);module.exports=r;
